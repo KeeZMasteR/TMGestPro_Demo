@@ -10,15 +10,52 @@ const generateId = () => {
 
 // Obter todos os items de uma entidade
 const getAll = (entityName) => {
-  const key = STORAGE_PREFIX + entityName;
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : [];
+  try {
+    const key = STORAGE_PREFIX + entityName;
+    const data = localStorage.getItem(key);
+    
+    // Se não existir dados, retorna array vazio
+    if (!data || data === 'null' || data === 'undefined') {
+      return [];
+    }
+    
+    // Tenta fazer parse do JSON
+    const parsed = JSON.parse(data);
+    
+    // Garante que retorna um array
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn(`[MockDataStore] Erro ao ler ${entityName}:`, error);
+    // Em caso de erro, retorna array vazio para não crashar a aplicação
+    return [];
+  }
 };
 
 // Salvar todos os items de uma entidade
 const saveAll = (entityName, items) => {
-  const key = STORAGE_PREFIX + entityName;
-  localStorage.setItem(key, JSON.stringify(items));
+  try {
+    const key = STORAGE_PREFIX + entityName;
+    
+    // Garante que items é um array
+    const dataToSave = Array.isArray(items) ? items : [];
+    
+    localStorage.setItem(key, JSON.stringify(dataToSave));
+  } catch (error) {
+    console.error(`[MockDataStore] Erro ao guardar ${entityName}:`, error);
+    
+    // Se falhar por quota excedida, tenta limpar dados antigos
+    if (error.name === 'QuotaExceededError') {
+      console.warn('[MockDataStore] Quota do localStorage excedida. A limpar dados...');
+      clearMockData();
+      // Tenta novamente após limpar
+      try {
+        const key = STORAGE_PREFIX + entityName;
+        localStorage.setItem(key, JSON.stringify(items));
+      } catch (retryError) {
+        console.error('[MockDataStore] Falha ao guardar mesmo após limpeza:', retryError);
+      }
+    }
+  }
 };
 
 // Criar entity mock com operações CRUD
@@ -26,121 +63,165 @@ const createMockEntity = (entityName) => {
   return {
     // LIST - Listar todos os itens (com ordenação opcional)
     list: async (sortBy = '-created_date', limit = 1000) => {
-      const items = getAll(entityName);
-      
-      // Aplicar ordenação se especificada
-      if (sortBy) {
-        const isDesc = sortBy.startsWith('-');
-        const field = isDesc ? sortBy.substring(1) : sortBy;
+      try {
+        const items = getAll(entityName);
         
-        items.sort((a, b) => {
-          const aVal = a[field];
-          const bVal = b[field];
+        // Se não houver itens, retorna array vazio
+        if (!items || items.length === 0) {
+          return [];
+        }
+        
+        // Aplicar ordenação se especificada
+        if (sortBy) {
+          const isDesc = sortBy.startsWith('-');
+          const field = isDesc ? sortBy.substring(1) : sortBy;
           
-          if (aVal === bVal) return 0;
-          if (aVal === undefined) return 1;
-          if (bVal === undefined) return -1;
-          
-          const result = aVal > bVal ? 1 : -1;
-          return isDesc ? -result : result;
-        });
+          items.sort((a, b) => {
+            const aVal = a[field];
+            const bVal = b[field];
+            
+            if (aVal === bVal) return 0;
+            if (aVal === undefined) return 1;
+            if (bVal === undefined) return -1;
+            
+            const result = aVal > bVal ? 1 : -1;
+            return isDesc ? -result : result;
+          });
+        }
+        
+        // Aplicar limite
+        return items.slice(0, limit);
+      } catch (error) {
+        console.error(`[MockDataStore] Erro ao listar ${entityName}:`, error);
+        return [];
       }
-      
-      // Aplicar limite
-      return items.slice(0, limit);
     },
 
     // FILTER - Filtrar itens por critérios
     filter: async (criteria) => {
-      const items = getAll(entityName);
-      
-      return items.filter(item => {
-        return Object.keys(criteria).every(key => {
-          return item[key] === criteria[key];
+      try {
+        const items = getAll(entityName);
+        
+        if (!items || items.length === 0) {
+          return [];
+        }
+        
+        return items.filter(item => {
+          return Object.keys(criteria).every(key => {
+            return item[key] === criteria[key];
+          });
         });
-      });
+      } catch (error) {
+        console.error(`[MockDataStore] Erro ao filtrar ${entityName}:`, error);
+        return [];
+      }
     },
 
     // GET - Obter um item específico por ID
     get: async (id) => {
-      const items = getAll(entityName);
-      const item = items.find(item => item.id === id);
-      
-      if (!item) {
-        throw new Error(`${entityName} com id ${id} não encontrado`);
+      try {
+        const items = getAll(entityName);
+        const item = items.find(item => item.id === id);
+        
+        if (!item) {
+          throw new Error(`${entityName} com id ${id} não encontrado`);
+        }
+        
+        return item;
+      } catch (error) {
+        console.error(`[MockDataStore] Erro ao obter ${entityName} com id ${id}:`, error);
+        throw error;
       }
-      
-      return item;
     },
 
     // CREATE - Criar novo item
     create: async (data) => {
-      const items = getAll(entityName);
-      
-      const newItem = {
-        ...data,
-        id: generateId(),
-        created_date: new Date().toISOString(),
-        updated_date: new Date().toISOString(),
-      };
-      
-      items.push(newItem);
-      saveAll(entityName, items);
-      
-      return newItem;
+      try {
+        const items = getAll(entityName);
+        
+        const newItem = {
+          ...data,
+          id: generateId(),
+          created_date: new Date().toISOString(),
+          updated_date: new Date().toISOString(),
+        };
+        
+        items.push(newItem);
+        saveAll(entityName, items);
+        
+        return newItem;
+      } catch (error) {
+        console.error(`[MockDataStore] Erro ao criar ${entityName}:`, error);
+        throw error;
+      }
     },
 
     // BULK CREATE - Criar múltiplos itens
     bulkCreate: async (dataArray) => {
-      const items = getAll(entityName);
-      
-      const newItems = dataArray.map(data => ({
-        ...data,
-        id: generateId(),
-        created_date: new Date().toISOString(),
-        updated_date: new Date().toISOString(),
-      }));
-      
-      items.push(...newItems);
-      saveAll(entityName, items);
-      
-      return newItems;
+      try {
+        const items = getAll(entityName);
+        
+        const newItems = dataArray.map(data => ({
+          ...data,
+          id: generateId(),
+          created_date: new Date().toISOString(),
+          updated_date: new Date().toISOString(),
+        }));
+        
+        items.push(...newItems);
+        saveAll(entityName, items);
+        
+        return newItems;
+      } catch (error) {
+        console.error(`[MockDataStore] Erro ao criar múltiplos ${entityName}:`, error);
+        throw error;
+      }
     },
 
     // UPDATE - Atualizar item existente
     update: async (id, data) => {
-      const items = getAll(entityName);
-      const index = items.findIndex(item => item.id === id);
-      
-      if (index === -1) {
-        throw new Error(`${entityName} com id ${id} não encontrado`);
+      try {
+        const items = getAll(entityName);
+        const index = items.findIndex(item => item.id === id);
+        
+        if (index === -1) {
+          throw new Error(`${entityName} com id ${id} não encontrado`);
+        }
+        
+        const updatedItem = {
+          ...items[index],
+          ...data,
+          id, // Manter o ID original
+          updated_date: new Date().toISOString(),
+        };
+        
+        items[index] = updatedItem;
+        saveAll(entityName, items);
+        
+        return updatedItem;
+      } catch (error) {
+        console.error(`[MockDataStore] Erro ao atualizar ${entityName} com id ${id}:`, error);
+        throw error;
       }
-      
-      const updatedItem = {
-        ...items[index],
-        ...data,
-        id, // Manter o ID original
-        updated_date: new Date().toISOString(),
-      };
-      
-      items[index] = updatedItem;
-      saveAll(entityName, items);
-      
-      return updatedItem;
     },
 
     // DELETE - Remover item
     delete: async (id) => {
-      const items = getAll(entityName);
-      const filteredItems = items.filter(item => item.id !== id);
-      
-      if (items.length === filteredItems.length) {
-        throw new Error(`${entityName} com id ${id} não encontrado`);
+      try {
+        const items = getAll(entityName);
+        const filteredItems = items.filter(item => item.id !== id);
+        
+        if (items.length === filteredItems.length) {
+          throw new Error(`${entityName} com id ${id} não encontrado`);
+        }
+        
+        saveAll(entityName, filteredItems);
+        
+        return { success: true, id };
+      } catch (error) {
+        console.error(`[MockDataStore] Erro ao deletar ${entityName} com id ${id}:`, error);
+        throw error;
       }
-      
-      saveAll(entityName, filteredItems);
-      
-      return { success: true, id };
     },
   };
 };

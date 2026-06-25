@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { base44, isDemoMode } from '@/api/base44Client';
 import { clearMockData, seedMockData } from '@/api/mockDataStore';
+import { clearAll } from '@/services/storage';
 
 const DemoContext = createContext(null);
 const SESSION_KEY = 'tmgestpro_demo_v5_session';
@@ -62,27 +63,23 @@ export function DemoProvider({ children }) {
 
   const resetDemoData = async () => {
     try {
-      const entities = ['Budget', 'Client', 'PriceItem', 'CompanyProfile', 'ScheduledWork'];
-      for (const name of entities) {
-        try {
-          const allItems = await base44.entities[name].list();
-          // Limpeza Total: Apaga TUDO o que for teu ou que não tenha ID (limpa fantasmas)
-          const toDelete = allItems.filter(item => 
-            !item.demo_session_id || 
-            item.demo_session_id === 'undefined' ||
-            item.demo_session_id === 'null' ||
-            String(item.demo_session_id) === String(demoSessionId)
-          );
-          
-          for (const item of toDelete) {
-            try { await base44.entities[name].delete(item.id); } catch (e) {}
-          }
-        } catch (err) {}
-      }
-      localStorage.removeItem(SESSION_KEY);
+      console.log('[DemoContext] Iniciando limpeza TOTAL do localStorage...');
+      
+      // Limpa COMPLETAMENTE o localStorage para garantir que a demo fica 100% limpa
+      localStorage.clear();
+      
+      console.log('[DemoContext] localStorage completamente limpo. Redirecionando...');
+      
+      // Redireciona para a página inicial
       window.location.href = '/';
     } catch (e) {
-      localStorage.removeItem(SESSION_KEY);
+      console.error('[DemoContext] Erro ao limpar dados:', e);
+      // Mesmo em caso de erro, força limpeza total e recarrega
+      try {
+        localStorage.clear();
+      } catch (clearError) {
+        console.error('[DemoContext] Falha crítica ao limpar localStorage:', clearError);
+      }
       window.location.reload();
     }
   };

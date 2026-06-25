@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as SonnerToaster } from "@/components/ui/sonner"
 import { QueryClientProvider } from '@tanstack/react-query'
@@ -6,6 +7,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider } from '@/lib/AuthContext';
 import { DemoProvider } from '@/lib/DemoContext';
+import { clearAll } from '@/services/storage';
 
 import AppLayout from '@/components/layout/AppLayout';
 import Dashboard from '@/pages/Dashboard';
@@ -50,6 +52,23 @@ const AuthenticatedApp = () => {
 };
 
 function App() {
+  // Limpa todos os dados ao fechar a janela/tab do navegador
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      console.log('[App] Fechando janela - Limpando TODOS os dados do localStorage...');
+      // Limpa COMPLETAMENTE o localStorage para garantir que a demo fica limpa
+      localStorage.clear();
+    };
+
+    // Adiciona listener para quando o utilizador fechar a janela
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Cleanup: Remove listener quando o componente for desmontado
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClientInstance}>
       <Router>
