@@ -1,0 +1,226 @@
+{
+  "name": "Budget",
+  "type": "object",
+  "properties": {
+    "doc_type": {
+      "type": "string",
+      "enum": [
+        "orcamento",
+        "nota_servico"
+      ],
+      "default": "orcamento",
+      "description": "Tipo de documento"
+    },
+    "budget_number": {
+      "type": "string",
+      "description": "N\u00famero do or\u00e7amento (ex: #LB2.1/26)"
+    },
+    "client_id": {
+      "type": "string",
+      "description": "ID do cliente"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nome do cliente"
+    },
+    "client_address": {
+      "type": "string",
+      "description": "Morada do cliente"
+    },
+    "client_postal_code": {
+      "type": "string",
+      "description": "C\u00f3digo postal do cliente"
+    },
+    "client_city": {
+      "type": "string",
+      "description": "Cidade do cliente"
+    },
+    "client_contact_person": {
+      "type": "string",
+      "description": "Pessoa de contacto"
+    },
+    "client_nif": {
+      "type": "string",
+      "description": "NIF do cliente"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do or\u00e7amento"
+    },
+    "request_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do pedido (Nota de Servi\u00e7o)"
+    },
+    "completion_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de conclus\u00e3o (Nota de Servi\u00e7o)"
+    },
+    "completion_time": {
+      "type": "string",
+      "description": "Hora de conclus\u00e3o (ex: 14:30)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "enviado",
+        "aceite",
+        "recusado",
+        "faturado",
+        "pago"
+      ],
+      "default": "rascunho",
+      "description": "Estado do documento"
+    },
+    "invoice_url": {
+      "type": "string",
+      "description": "URL do PDF da fatura oficial (upload do portal das Finan\u00e7as)"
+    },
+    "payment_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de pagamento (quando estado = pago)"
+    },
+    "surcharge_type": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "noturno",
+        "fim_semana"
+      ],
+      "default": "normal",
+      "description": "Agravamento de taxa (normal, noturno +25%, fim de semana +25%)"
+    },
+    "items": {
+      "type": "array",
+      "description": "Linhas do or\u00e7amento",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "custom_service": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "descricao": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "unidade": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "quantidade": {
+            "type": "number"
+          },
+          "unit_price": {
+            "type": "number"
+          },
+          "preco_unit": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "is_night": {
+            "type": "boolean",
+            "default": false,
+            "description": "Se o servi\u00e7o \u00e9 noturno (+25%)"
+          },
+          "is_optional": {
+            "type": "boolean",
+            "default": false
+          },
+          "block_type": {
+            "type": "string",
+            "enum": [
+              "servicos",
+              "materiais",
+              "opcionais"
+            ],
+            "default": "servicos"
+          },
+          "tipo": {
+            "type": "string",
+            "description": "Tipo de item (Presta\u00e7\u00e3o de Servi\u00e7os, Material, Outros)"
+          },
+          "category": {
+            "type": "string"
+          },
+          "catalog_item_id": {
+            "type": "string"
+          },
+          "sub_rows": {
+            "type": "array",
+            "description": "Sub-linhas para grupos de servi\u00e7os",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "custom_label": {
+                  "type": "string"
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "qty": {
+                  "type": "number"
+                },
+                "unit_price": {
+                  "type": "number"
+                },
+                "total": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "subtotal": {
+      "type": "number",
+      "description": "Subtotal sem IVA"
+    },
+    "vat_amount": {
+      "type": "number",
+      "description": "Valor do IVA (23%)"
+    },
+    "total_amount": {
+      "type": "number",
+      "description": "Valor total do or\u00e7amento (com IVA se aplic\u00e1vel)"
+    },
+    "optional_total": {
+      "type": "number",
+      "description": "Total dos itens opcionais"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionais / Descri\u00e7\u00e3o do servi\u00e7o"
+    },
+    "demo_session_id": {
+      "type": "string",
+      "description": "Identificador da sess\u00e3o demo do utilizador"
+    }
+  },
+  "required": [
+    "budget_number",
+    "client_id"
+  ]
+}

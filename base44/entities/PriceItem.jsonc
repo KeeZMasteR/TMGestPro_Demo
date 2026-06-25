@@ -1,0 +1,55 @@
+{
+  "name": "PriceItem",
+  "type": "object",
+  "properties": {
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "Presta\u00e7\u00e3o de Servi\u00e7os",
+        "Material",
+        "Outros"
+      ],
+      "default": "Presta\u00e7\u00e3o de Servi\u00e7os",
+      "description": "Tipo do item"
+    },
+    "categoria": {
+      "type": "string",
+      "description": "Categoria (texto livre, ex: M\u00e3o de Obra, Coberturas)"
+    },
+    "subcategoria": {
+      "type": "string",
+      "description": "Subcategoria (texto livre, ex: Pedreiro, Pintura Interior)"
+    },
+    "nome": {
+      "type": "string",
+      "description": "Nome do servi\u00e7o ou material"
+    },
+    "unidade": {
+      "type": "string",
+      "enum": [
+        "H",
+        "m2",
+        "m3",
+        "ml",
+        "Kg",
+        "Und",
+        "Desloca\u00e7\u00e3o"
+      ],
+      "description": "Unidade de medida"
+    },
+    "preco_unitario": {
+      "type": "number",
+      "description": "Pre\u00e7o unit\u00e1rio padr\u00e3o"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se o item est\u00e1 activo no cat\u00e1logo"
+    }
+  },
+  "required": [
+    "nome",
+    "unidade",
+    "preco_unitario"
+  ]
+}

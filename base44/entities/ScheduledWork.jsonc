@@ -1,0 +1,45 @@
+{
+  "name": "ScheduledWork",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do trabalho marcado"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo/descri\u00e7\u00e3o do trabalho"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nome do cliente"
+    },
+    "client_id": {
+      "type": "string",
+      "description": "ID do cliente (se existir)"
+    },
+    "budget_id": {
+      "type": "string",
+      "description": "ID do or\u00e7amento associado (opcional)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "concluido",
+        "cancelado"
+      ],
+      "default": "pendente",
+      "description": "Estado do trabalho marcado"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionais"
+    }
+  },
+  "required": [
+    "date",
+    "title"
+  ]
+}

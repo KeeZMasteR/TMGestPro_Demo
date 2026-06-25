@@ -1,0 +1,30 @@
+{
+  "name": "AllowedEmail",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string",
+      "description": "Email autorizado a aceder \u00e0 app"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nome do utilizador (opcional)"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user"
+      ],
+      "default": "user",
+      "description": "Papel do utilizador na app"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas sobre o utilizador"
+    }
+  },
+  "required": [
+    "email"
+  ]
+}

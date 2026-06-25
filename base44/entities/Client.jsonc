@@ -1,0 +1,41 @@
+{
+  "name": "Client",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nome completo do cliente"
+    },
+    "address": {
+      "type": "string",
+      "description": "Morada completa"
+    },
+    "postal_code": {
+      "type": "string",
+      "description": "C\u00f3digo postal"
+    },
+    "city": {
+      "type": "string",
+      "description": "Cidade"
+    },
+    "contact_person": {
+      "type": "string",
+      "description": "Pessoa de contacto (ex: A/C Da Solange Ribeiro)"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Telefone"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email"
+    },
+    "nif": {
+      "type": "string",
+      "description": "NIF do cliente"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

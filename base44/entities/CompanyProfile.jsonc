@@ -1,0 +1,76 @@
+{
+  "name": "CompanyProfile",
+  "type": "object",
+  "properties": {
+    "company_name": {
+      "type": "string",
+      "description": "Nome da empresa ou prestador de servi\u00e7os"
+    },
+    "nif": {
+      "type": "string",
+      "description": "N\u00famero de Identifica\u00e7\u00e3o Fiscal"
+    },
+    "address": {
+      "type": "string",
+      "description": "Morada completa"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Telefone / Contacto"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email de contacto"
+    },
+    "website": {
+      "type": "string",
+      "description": "Website (opcional)"
+    },
+    "iban": {
+      "type": "string",
+      "description": "IBAN para pagamentos"
+    },
+    "currency": {
+      "type": "string",
+      "enum": [
+        "EUR",
+        "USD",
+        "GBP",
+        "BRL",
+        "CHF"
+      ],
+      "default": "EUR",
+      "description": "Moeda padr\u00e3o"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "URL do log\u00f3tipo da empresa"
+    },
+    "document_template": {
+      "type": "string",
+      "enum": [
+        "classic",
+        "modern"
+      ],
+      "default": "classic",
+      "description": "Layout dos documentos PDF"
+    },
+    "budget_background_url": {
+      "type": "string",
+      "description": "URL de fundo personalizado para Or\u00e7amentos (PDF)"
+    },
+    "validity_days": {
+      "type": "number",
+      "default": 15,
+      "description": "Validade padr\u00e3o dos or\u00e7amentos (dias)"
+    },
+    "vat_rate": {
+      "type": "number",
+      "default": 23,
+      "description": "Taxa de IVA padr\u00e3o (%)"
+    }
+  },
+  "required": [
+    "company_name"
+  ]
+}
